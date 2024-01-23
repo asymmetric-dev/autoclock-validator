@@ -17,6 +17,12 @@
   shell: mount /dev/{{ ledger_disk }} /mnt/solana-ledger && chown -R solana:solana /mnt/solana-ledger
   when: mount_mnt.rc != 0
 
+- name: mount disks for snapshots
+  become: true
+  become_user: root
+  shell: mount /dev/{{ snapshots_disk }} /mnt/solana-snapshots && chown -R solana:solana /mnt/solana-snapshots
+  when: mount_mnt.rc != 0
+
 - name: add mounted disk to fstab
   become: true
   become_user: root
