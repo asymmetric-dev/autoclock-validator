@@ -9,7 +9,7 @@ cluster: mainnet
 location: "ny"
 
 # commission in basis points. 100 bps = 1%
-commission_bps: 500
+commission_bps: 800
 
 rpc_address: https://api.mainnet-beta.solana.com
 
@@ -19,4 +19,4 @@ metrics: true
 org_name: "jito-foundation"
 repo_name: "jito-solana"
 repo_dir: "jito-solana"
-repo_version: "v1.17.16-jito"
+repo_version: "v1.17.28-jito"

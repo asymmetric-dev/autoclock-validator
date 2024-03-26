@@ -26,14 +26,6 @@
   become: true
   become_user: root
 
-- name: solana snapshots
-  file:
-    path: /mnt/solana-snapshots
-    state: directory
-    owner: solana
-    group: solana
-  become: true
-  become_user: root
 
 - name: solana accounts
   file:
