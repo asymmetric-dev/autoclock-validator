@@ -1,7 +1,7 @@
-## Autoclock Validator
+## Autoclock Validator (Asymmetric Fork)
 * A fast and straightforward way to spin up a Solana validator running the Jito client. 
-* The Autoclock Validator Ansible script has been designed and tested on c3.large [Latitude](https://www.latitude.sh/pricing) servers running Ubuntu thus far. Other OS and machine/disk configurations are untested yet, but feel free to fork or submit PRs to support additional infra.
-* C3.large machines have 2 disks. One of these is mounted to / and the second one needs to be supplied in the defaults.
+* The Autoclock Validator (Asymmetric) Ansible script has been designed and tested on s3.large [Latitude](https://www.latitude.sh/pricing) servers running Ubuntu thus far. Other OS and machine/disk configurations are untested yet, but feel free to fork or submit PRs to support additional infra.
+* S3.large machines have 2 disks. One of these is mounted to / and the second one needs to be supplied in the defaults.
 
 ### Follow these steps:
 
@@ -31,6 +31,7 @@ ansible-playbook setup.yaml -i hosts.yaml -e id_path=./keys/validator-keypair.js
 * https://github.com/overclock-validator/autoclock-validator/blob/master/roles/common/defaults/main.yaml
 * Inside this file you will see (and may need to edit):
 ```
+accounts_disk: "nvme0n1"
 ledger_disk: "nvme1n1"
 swap_mb: 100000
 ```

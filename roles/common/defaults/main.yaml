@@ -1,5 +1,5 @@
 ---
+accounts_disk: "nvme0n1"
 ledger_disk: "nvme1n1"
-snapshots_disk: "nvme2n1"
 swap_mb: 100000
 

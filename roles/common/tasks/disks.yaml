@@ -1,46 +1,93 @@
-- name: check mount
+- name: Ensure the accounts partition is unmounted
   become: true
-  become_user: root
-  shell: df -h | grep mnt/solana-ledger
-  ignore_errors: yes
-  register: mount_mnt
+  shell: umount /dev/{{ accounts_disk }}p1 || true
 
-- name: format ledger disk with ext4
+- name: Ensure the ledger partition is unmounted
   become: true
-  become_user: root
-  shell: mkfs.ext4 /dev/{{ ledger_disk }}
-  when: mount_mnt.rc != 0
+  shell: umount /dev/{{ ledger_disk }}p1 || true
 
-- name: format snapshots disk with ext4
+- name: Check if ledger disk is already mounted
   become: true
-  become_user: root
-  shell: mkfs.ext4 /dev/{{ snapshots_disk }}
-  when: mount_mnt.rc != 0
+  command: mountpoint -q /mnt/solana-ledger
+  ignore_errors: true
+  register: mount_ledger
 
-- name: mount disks for accounts
+- name: Check if accounts disk is already mounted
   become: true
-  become_user: root
-  shell: mount /dev/{{ ledger_disk }} /mnt/solana-ledger && chown -R solana:solana /mnt/solana-ledger
-  when: mount_mnt.rc != 0
+  command: mountpoint -q /mnt/solana-accounts
+  ignore_errors: true
+  register: mount_accounts
 
-- name: mount disks for snapshots
+- name: Create a partition on the accounts disk
   become: true
-  become_user: root
-  shell: mount /dev/{{ snapshots_disk }} /mnt/solana-snapshots && chown -R solana:solana /mnt/solana-snapshots
-  when: mount_mnt.rc != 0
+  command: parted /dev/{{ accounts_disk }} --script mklabel gpt mkpart primary ext4 0% 100%
+  when: mount_accounts.rc != 0
 
-- name: add ledger disk to fstab
+- name: Create a partition on the ledger disk
   become: true
-  become_user: root
-  lineinfile:
-    dest: /etc/fstab
+  command: parted /dev/{{ ledger_disk }} --script mklabel gpt mkpart primary ext4 0% 100%
+  when: mount_ledger.rc != 0
+
+- name: Format accounts partition with ext4
+  become: true
+  filesystem:
+    fstype: ext4
+    dev: /dev/{{ accounts_disk }}p1
+  when: mount_accounts.rc != 0
+
+- name: Format ledger partition with ext4
+  become: true
+  filesystem:
+    fstype: ext4
+    dev: /dev/{{ ledger_disk }}p1
+  when: mount_ledger.rc != 0
+
+- name: Create mount point for accounts disk
+  become: true
+  file:
+    path: /mnt/solana-accounts
+    state: directory
+  when: mount_accounts.rc != 0
+
+- name: Create mount point for ledger disk
+  become: true
+  file:
+    path: /mnt/solana-ledger
+    state: directory
+  when: mount_ledger.rc != 0
+
+- name: Mount accounts disk
+  become: true
+  mount:
+    path: /mnt/solana-accounts
+    src: /dev/{{ accounts_disk }}p1
+    fstype: ext4
+    state: mounted
+  when: mount_accounts.rc != 0
+
+- name: Mount ledger disk
+  become: true
+  mount:
+    path: /mnt/solana-ledger
+    src: /dev/{{ ledger_disk }}p1
+    fstype: ext4
+    state: mounted
+  when: mount_ledger.rc != 0
+
+- name: Add accounts disk to fstab
+  become: true
+  mount:
+    path: /mnt/solana-accounts
+    src: /dev/{{ accounts_disk }}p1
+    fstype: ext4
+    opts: defaults
     state: present
-    line: "/dev/{{ ledger_disk }}    /mnt/solana-ledger    ext4    defaults    0    1"
 
-- name: add snapshots disk to fstab
+- name: Add ledger disk to fstab
   become: true
-  become_user: root
-  lineinfile:
-    dest: /etc/fstab
+  mount:
+    path: /mnt/solana-ledger
+    src: /dev/{{ ledger_disk }}p1
+    fstype: ext4
+    opts: defaults
     state: present
-    line: "/dev/{{ snapshots_disk }}    /mnt/solana-snapshots    ext4    defaults    0    1"

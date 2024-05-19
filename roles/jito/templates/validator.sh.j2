@@ -13,7 +13,7 @@
       --log /mnt/logs/solana-validator.log \
       --accounts /mnt/solana-accounts \
       --ledger /mnt/solana-ledger \
-      --snapshots /mnt/solana-snapshots \
+      --snapshots /mnt/solana-ledger\
       --vote-account /home/solana/.keys/validator_vote.json \
       --no-snapshot-fetch \
       --private-rpc \
@@ -23,7 +23,6 @@
       --commission-bps {{ commission_bps }} \
       --relayer-url {{ jito_relayer_url }} \
       --block-engine-url {{ jito_block_engine_url }} \
-      --expected-bank-hash 69p75jzzT1P2vJwVn3wbTVutxHDcWKAgcbjqXvwCVUDE \
       --shred-receiver-address {{ jito_shred_receiver_address }}
   {% else %}
     export SOLANA_METRICS_CONFIG="host=https://metrics.solana.com:8086,db=testnet,u=testnet_write,p=password"
